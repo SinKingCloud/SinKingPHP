@@ -53,10 +53,18 @@ class Session
      * 清除session 
      * @param  String  $name  session name 
      */
-    public static function clear($name)
+    public static function clear($name = null)
     {
-		self::start();
-		$_SESSION[$name]=null;
-        unset($_SESSION[$name]);
+        self::start();
+        if (empty($name)) {
+            foreach($_SESSION as $key => $value){
+                $_SESSION[$key]=null;
+                unset($_SESSION[$key]);
+            }
+        }else {
+            $_SESSION[$name]=null;
+            unset($_SESSION[$name]);
+        }
+		
     }
 }

@@ -60,15 +60,15 @@ class Cookie
 	public static function clear($name = null){
 		if($name==null){
 			foreach ($_COOKIE as $key => $value){
-				setcookie($key, null,time()-3600);
+				self::set($key, null, ['expire' => time()-3600]);
 			}
 		}else if(is_array($name)){
 			foreach ($name as $key){
-				setcookie($key, null,time()-3600);
+				self::set($key, null, ['expire' => time()-3600]);
 			}
 		}
 		if(!empty($name)){
-			setcookie($name,null,time()-3600);
+			self::set($name, null, ['expire' => time()-3600]);
 		}
 	}
 }

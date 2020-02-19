@@ -12,4 +12,5 @@ define('APP_PATH', __DIR__ . '/Application/');
 // 定义缓存目录
 define('CACHE_PATH', __DIR__ . '/Cache/');
 // 加载框架引导文件
-require __DIR__ . '/Core/Run.php';
+require __DIR__ . '/Core/App.php';
+App::start();

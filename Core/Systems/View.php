@@ -21,12 +21,17 @@ class View
     }
 	/*
 	* @param 模板渲染
-	* @page:模板文件
+	* @param $page:模板文件
 	*/
     public function fetch($page = null)
     {
+		if (file_exists($page)) {
+			$this->assign($this->key, $this->val);
+			extract($this->array);
+            return include_once $page;
+        }
         if (empty($page)) {
-			$page = explode("/", $this->module ."/". $this->controller ."/".$this->action);
+			$page = explode("/", $this->module ."/".$this->controller ."/".$this->action);
 			$page = end($page);
 		}
 		if (strpos($page, '.html')) {
@@ -34,12 +39,13 @@ class View
 		} else {
 			$return = $page . ".html";
 		}
+		$return = strtolower($return);
 		$this->assign($this->key, $this->val);
         extract($this->array);
 		if(substr($return,0,1)=='/'){
-			$return = $this->app_path .strtolower($this->module .'/'. $this->config['default_view_name']. '/' . $return);
+			$return = $this->app_path .ucwords(strtolower($this->module)) .'/'. $this->config['default_view_name']. '/' . $return;
 		}else{
-			$return = $this->app_path .strtolower($this->module .'/'. $this->config['default_view_name']. '/' . $this->controller  . '/' . $return);
+			$return = $this->app_path .ucwords(strtolower($this->module)) .'/'. $this->config['default_view_name']. '/' . strtolower($this->controller)  . '/' . $return;
 		}
         if (file_exists($return)) {
             return include_once $return;

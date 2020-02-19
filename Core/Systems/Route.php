@@ -11,6 +11,7 @@ use Systems\Errors;
 class Route
 {
 	private static  $Config;
+	private static  $Routes = array();
 	private static  $Module; //模块变量
 	private static  $Controller; //控制器变量
 	private static  $Action; //方法变量
@@ -19,8 +20,9 @@ class Route
 	public static function Init($config)
 	{
 		self::$Config = $config;
+		self::LoadFile();
 		if (self::$Config['default_route']['open']) {
-			$url = self::GetRoutes(self::$Config['default_route']['route']);
+			$url = self::GetRoutes(self::$Routes);
 		} else {
 			$url = self::GetUrls();
 		}
@@ -33,6 +35,13 @@ class Route
 			if ($key >= 3) {
 				self::$Value[] = $value;
 			}
+		}
+	}
+	public static function Add($name,$value){
+		try {
+			self::$Routes[$name]=$value;
+		} catch (\Throwable $th) {
+			Errors::show($th);
 		}
 	}
 	private static function ReSet($url)
@@ -67,6 +76,22 @@ class Route
 			}
 		}
 	}
+    private static function LoadFile()
+    {
+        if (!empty(self::$Config['default_route']['file'])) {
+            if (is_array(self::$Config['default_route']['file'])) {
+                foreach (self::$Config['default_route']['file'] as $key) {
+                    if (file_exists(APP_PATH . $key)) {
+                        require_once(APP_PATH . $key);
+                    }
+                }
+            } else {
+                if (file_exists(APP_PATH . self::$Config['default_route']['file'])) {
+                    require_once(APP_PATH . self::$Config['default_route']['file']);
+                }
+            }
+        }
+    }
 	private static function GetUrls()
 	{
 		return explode("/", explode("?", $_SERVER['REQUEST_URI'])[0]);

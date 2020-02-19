@@ -26,11 +26,10 @@ class Errors
     private static function shows($error)
     {
         if (!self::$Config['default_debug']) {
-            $error = '<h1>框架运行错误</h1>';
+            $error = '<h2>框架运行错误</h2>';
         }
         if (file_exists(__DIR__ . "//../Error/Error.html")) {
-            require(__DIR__ . "//../Error/Error.html");
+            exit(require(__DIR__ . "//../Error/Error.html"));
         }
-        exit;
     }
 }

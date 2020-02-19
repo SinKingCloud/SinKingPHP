@@ -8,22 +8,56 @@
 
 use Systems\Route;
 use Systems\Errors;
+use Systems\Cache;
 
-class Run
+class App
 {
-    function __construct()
+    protected $config;
+    protected $module;
+    protected $controller;
+    protected $action;
+    protected $app_path;
+    protected $value;
+    /**
+     * 运行
+     * @return Object 框架核心
+     */
+    public static function start()
     {
-        spl_autoload_register('self::autoload');
-        $this->config = require_once("Config/Config.php");
-        Errors::Init($this->config);
-        Route::Init($this->config);
-        $this->module = Route::GetModule();
-        $this->controller = Route::GetController();
-        $this->action = Route::GetAction();
-        $this->app_path = defined('APP_PATH') ? APP_PATH : $this->config['application_dir'];
-        $this->value = Route::GetValue();
+        $app = new self();
+        return $app->Init()->run();
     }
-    //自动加载
+    /**
+     * 构造参数
+     */
+    private function Init()
+    {
+        try {
+            $this->autoload_register();
+            $this->removeMagicQuotes();
+            $this->config = require_once("Config/Config.php");
+            Errors::Init($this->config);
+            Route::Init($this->config);
+            if ($this->config['DB_Cache']['open']) {
+                Cache::init($this->config);
+            }
+            $this->module = Route::GetModule();
+            $this->controller = Route::GetController();
+            $this->action = Route::GetAction();
+            $this->app_path = defined('APP_PATH') ? APP_PATH : $this->config['application_dir'];
+            if (!defined('APP_PATH')) {
+                define('APP_PATH', $this->app_path);
+            }
+            $this->value = Route::GetValue();
+            return $this;
+        } catch (\Throwable $th) {
+            Errors::show($th);
+        }
+    }
+    /**
+     * 自动加载
+     * @param String $class 类名
+     */
     private function autoload($class)
     {
         $dir = str_replace('\\', '/', $class) . '.php';
@@ -39,14 +73,21 @@ class Run
         }
         unset($dir);
     }
-    //框架运行
+    /**
+     * 方法注册
+     */
+    private function autoload_register()
+    {
+        spl_autoload_register('self::autoload');
+    }
+    /**
+     * 框架运行
+     */
     public function run()
     {
-
         try {
-            $this->removeMagicQuotes();
             $this->LoadFile();
-            $class = $this->config['default_namespace'] . '\\' . $this->module . '\\' . $this->config['default_controller_name'] . '\\' . $this->controller;
+            $class = $this->config['default_namespace'] . '\\' . ucwords(strtolower($this->module)) . '\\' . $this->config['default_controller_name'] . '\\' . ucwords(strtolower($this->controller));
             $controller = new $class();
             if (method_exists($controller, $this->action)) {
                 call_user_func_array(array($controller, $this->action), $this->value);
@@ -54,10 +95,12 @@ class Run
                 Errors::show("方法不存在</br>" . $this->action);
             }
         } catch (\Throwable $th) {
-            Errors::show($th->getMessage());
+            Errors::show($th);
         }
     }
-    //加载文件
+    /**
+     * 加载文件
+     */
     private function LoadFile()
     {
         if (!empty($this->config['default_loadfile'])) {
@@ -74,13 +117,18 @@ class Run
             }
         }
     }
-    // 删除敏感字符
+    /**
+     * 构造参数
+     * @param String $value 字符串
+     */
     private function stripSlashesDeep($value)
     {
         $value = is_array($value) ? array_map(array($this, 'stripSlashesDeep'), $value) : stripslashes($value);
         return $value;
     }
-    // 检测敏感字符并删除
+    /**
+     * 删除敏感字符
+     */
     private function removeMagicQuotes()
     {
         $_GET = isset($_GET) ? $this->stripSlashesDeep($_GET) : '';
@@ -89,5 +137,3 @@ class Run
         $_SESSION = isset($_SESSION) ? $this->stripSlashesDeep($_SESSION) : '';
     }
 }
-$start = new Run();
-$start->run();

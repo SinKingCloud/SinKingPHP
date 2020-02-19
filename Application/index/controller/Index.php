@@ -6,14 +6,13 @@
 * QQ：1178710004
 */
 
-namespace app\index\controller;
-
+namespace app\Index\Controller;
 use Systems\Console;
+use app\Index\Model\User;
 class Index extends Console
 {
-    public function index()
-    {
-        $this->assign("test","Hellow World!");
-        return $this->fetch();
-    }
+    public function index(){
+		$this->assign("userinfo",User::info("朋友"));
+		return $this->fetch();
+	}
 }

@@ -8,7 +8,6 @@
 namespace Systems;
 use Systems\View;
 use Systems\Route;
-use Systems\Errors;
 class Console extends View
 {
 	public function __construct()
@@ -24,6 +23,6 @@ class Console extends View
 	* @arr:需要转换的数组
 	*/
 	public function json($arr = array()){
-		exit(json_encode($arr));
+		exit(json_encode($arr,JSON_UNESCAPED_UNICODE));
 	}
 }

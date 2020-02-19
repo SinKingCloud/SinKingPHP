@@ -5,3 +5,4 @@
 * Author:流逝中沉沦
 * QQ：1178710004
 */
+require_once("functions.php");

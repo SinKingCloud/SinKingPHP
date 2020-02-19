@@ -4,8 +4,12 @@
  * Author:流逝中沉沦
  * QQ：1178710004
 */
+
 namespace Systems;
+
 use PDO;
+use Systems\Errors;
+
 class Db
 {
     protected static $_dbh = null;
@@ -18,12 +22,12 @@ class Db
     protected $_user = 'root';
     protected $_pass = 'root';
     protected $_dbName = null;
-	protected $_prefix = '';
+    protected $_prefix = '';
     //数据库名
     protected $_sql = false;
     //最后一条sql语句
-	protected $_table = '';
-	protected $_join = '';
+    protected $_table = '';
+    protected $_join = '';
     protected $_where = '';
     protected $_order = '';
     protected $_limit = '';
@@ -38,21 +42,32 @@ class Db
      */
     public function __construct(array $conf = null)
     {
-		if($conf==null){
-			$this->config =require (__DIR__ . "//../Config/Config.php");
-		}else{
-			$this->config =$conf;
-		}
+        if ($conf == null) {
+            $this->config = require(__DIR__ . "//../Config/Config.php");
+        } else {
+            $this->config = $conf;
+        }
         class_exists('PDO') or die("PDO: class not exists.");
         $this->_host = $this->config['database']['database_host'];
         $this->_port = $this->config['database']['database_port'];
         $this->_user = $this->config['database']['database_user'];
         $this->_pass = $this->config['database']['database_pwd'];
         $this->_dbName = $this->config['database']['database_name'];
-		$this->_prefix = $this->config['database']['database_prefix'];
+        $this->_prefix = $this->config['database']['database_prefix'];
         //连接数据库
         if (is_null(self::$_dbh)) {
             $this->_connect();
+        }
+    }
+    /*
+     * 静态化Db
+     */
+    public static function init($config = null)
+    {
+        if ($config != null) {
+            return new self($config);
+        } else {
+            return new self();
         }
     }
     /**
@@ -69,7 +84,7 @@ class Db
             $dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             //禁用prepared statements的仿真效果(防SQL注入)
         } catch (PDOException $e) {
-            die('Connection failed: ' . $e->getMessage());
+            Errors::show($e);
         }
         $dbh->exec('SET NAMES utf8');
         self::$_dbh = $dbh;
@@ -82,7 +97,7 @@ class Db
      */
     protected function _addChar($value)
     {
-        if ('*' == $value || false !== strpos($value, '(') || false !== strpos($value, ')') || false !== strpos($value, '.') || false !== strpos($value, '`')||is_numeric($value)) {
+        if ('*' == $value || false !== strpos($value, '(') || false !== strpos($value, ')') || false !== strpos($value, '.') || false !== strpos($value, '`') || is_numeric($value)) {
             //如果包含* 或者 使用了sql方法 则不作处理
         } elseif (false === strpos($value, '`')) {
             $value = '`' . trim($value) . '`';
@@ -172,6 +187,7 @@ class Db
      */
     public function query($sql = '')
     {
+        $sql = str_replace("{DB_prefix}", $this->_prefix, $sql);
         $queryIps = 'INSERT|UPDATE|DELETE|REPLACE|CREATE|DROP|LOAD DATA|SELECT .* INTO|COPY|ALTER|GRANT|REVOKE|LOCK|UNLOCK';
         if (preg_match('/^\\s*"?(' . $queryIps . ')\\s+/i', $sql)) {
             return $this->_doExec($sql);
@@ -240,45 +256,45 @@ class Db
         $sql = "update " . trim($this->_table) . " set " . trim($val) . " " . trim($this->_where);
         return $this->_doExec($sql);
     }
-	/**
+    /**
      * 获取表名（无前缀）
      * @param string $tbName 操作的数据表名
      * @return array 结果集
      */
     public function table($tbName = '')
     {
-		$this->_table=$tbName;
+        $this->_table = $tbName;
         return $this;
     }
-	/**
+    /**
      * 获取表名（有前缀）
      * @param string $tbName 操作的数据表名
      * @return array 结果集
      */
     public function name($tbName = '')
     {
-		$this->_table=$this->_prefix . $tbName;
+        $this->_table = $this->_prefix . $tbName;
         return $this;
     }
-	/**
+    /**
      * 联查函数
      */
-    public function join($tbName,$left = null)
+    public function join($tbName, $left = null)
     {
         if (!isset($left)) {
-           $left="";
+            $left = "";
         }
-		if(is_array($tbName)){
-			$temp="";
-			foreach($tbName as $key){
-				$temp.= " {$left} join ".$this->_prefix ."{$key}";
-			}
-			$this->_join = $temp;
-			unset($temp);
-		}else{
-			$tbName = $this->_prefix . $tbName;
-			$this->_join = " {$left} join {$tbName}";
-		}
+        if (is_array($tbName)) {
+            $temp = "";
+            foreach ($tbName as $key) {
+                $temp .= " {$left} join " . $this->_prefix . "{$key}";
+            }
+            $this->_join = $temp;
+            unset($temp);
+        } else {
+            $tbName = $this->_prefix . $tbName;
+            $this->_join = " {$left} join {$tbName}";
+        }
         return $this;
     }
     /**
@@ -293,7 +309,7 @@ class Db
         $this->_clear();
         return $this->_doQuery(trim($sql));
     }
-	/**
+    /**
      * 查询函数(单条记录)
      * @return array 记录信息
      */
@@ -303,9 +319,9 @@ class Db
         //echo $sql.'</br>';
         $this->_clear = 1;
         $this->_clear();
-		if(empty($this->_doQuery(trim($sql))[0])){
-			return null;
-		}
+        if (empty($this->_doQuery(trim($sql))[0])) {
+            return null;
+        }
         return $this->_doQuery(trim($sql))[0];
     }
     /**
@@ -378,12 +394,12 @@ class Db
         }
         return $this;
     }
-	/**
+    /**
      * 设置分页查询行数及页数
      */
-    public function page($page=1, $pageSize = 10)
+    public function page($page = 1, $pageSize = 10)
     {
-		if ($this->_clear > 0) {
+        if ($this->_clear > 0) {
             $this->_clear();
         }
         if ($pageSize === null) {
@@ -392,34 +408,34 @@ class Db
             $pageval = intval(($page - 1) * $pageSize);
             $this->_limit = "limit " . $pageval . "," . $pageSize;
         }
-		$sql = "select " . trim($this->_field) . " from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " " . trim($this->_limit);
+        $sql = "select " . trim($this->_field) . " from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " " . trim($this->_limit);
         $sql2 = trim("SELECT COUNT(*) FROM " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order));
         $this->_clear = 1;
         $this->_clear();
-       // echo $sql."</br>";
-		$total = $this->_doQuery($sql2);
-		$return = array();
-		$return['Data']=$this->_doQuery(trim($sql));
-		$return['Total']=intval($total[0]['COUNT(*)']);
-		$return['TotalPages']=intval($return['Total']%$pageSize==0?$return['Total']/$pageSize:$return['Total']/$pageSize+1);
-		$return['NowPages']=$page;
-		$return['NowTotal']=count($return['Data']);
-        $return['PageSize']=$pageSize;
+        // echo $sql."</br>";
+        $total = $this->_doQuery($sql2);
+        $return = array();
+        $return['Data'] = $this->_doQuery(trim($sql));
+        $return['Total'] = intval($total[0]['COUNT(*)']);
+        $return['TotalPages'] = intval($return['Total'] % $pageSize == 0 ? $return['Total'] / $pageSize : $return['Total'] / $pageSize + 1);
+        $return['NowPages'] = $page;
+        $return['NowTotal'] = count($return['Data']);
+        $return['PageSize'] = $pageSize;
         return $return;
     }
-	/**
+    /**
      * 统计数量
      */
     public function count()
     {
-		if ($this->_clear > 0) {
+        if ($this->_clear > 0) {
             $this->_clear();
         }
-		$sql = "select COUNT(" . trim($this->_field) . ") from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " " . trim($this->_limit);
+        $sql = "select COUNT(" . trim($this->_field) . ") from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " " . trim($this->_limit);
         $this->_clear = 1;
         $this->_clear();
-		return $this->_doQuery($sql)[0]['COUNT(*)'];
-	}
+        return $this->_doQuery($sql)[0]['COUNT(*)'];
+    }
     /**
      * 设置查询字段
      * @param mixed $field 字段数组

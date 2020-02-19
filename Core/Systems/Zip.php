@@ -152,7 +152,9 @@ class Zip
         foreach ($array as $v) {
             $blen = strlen(pack("H*", $v[0])); //得到文件头标记字节数
             $tbin = substr($bin, 0, intval($blen)); ///需要比较文件头长度
-            if (strtolower($v[0]) == strtolower(array_shift(unpack("H*", $tbin)))) {
+            $a = unpack("H*", $tbin);
+            $a = array_shift($a);
+            if (strtolower($v[0]) == strtolower($a)) {
                 return true;
             }
         }

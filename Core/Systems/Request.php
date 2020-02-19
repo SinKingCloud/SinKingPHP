@@ -24,10 +24,23 @@ class Request
 			return false;
 		}
 	}
+
+	public static function GetData($key=""){
+		if(empty($key)){
+			return false;
+		}
+		if (isset($_GET[$key])) {
+			return $_GET[$key];
+		}elseif(isset($_POST[$key])){
+			return $_POST[$key];
+		}else{
+			return null;
+		}
+	}
 	
 	public static function GetPostData($key=""){
 		if(empty($key)){
-			return 'The value is null!';
+			return false;
 		}
 		if(isset($_POST[$key])){
 			return $_POST[$key];
@@ -38,7 +51,7 @@ class Request
 	
 	public static function GetGetData($key = ""){
 		if(empty($key)){
-			return 'The value is null!';
+			return false;
 		}
 		if(isset($_GET[$key])){
 			return $_GET[$key];
