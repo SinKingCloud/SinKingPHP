@@ -47,7 +47,7 @@ class Cache
                 case 'file':
                     $res = self::FileGet($key);
                     break;
-                case 'value':
+                case 'session':
                     $res = Session::get($key);
                     break;
             }
