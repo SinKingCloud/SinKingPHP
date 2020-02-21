@@ -13,6 +13,7 @@ use Systems\Errors;
 class Db
 {
     protected static $_dbh = null;
+    public static $configs;
     //静态属性,所有数据库实例共用,避免重复连接数据库
     protected $_dbType = 'mysql';
     protected $_pconnect = true;
@@ -42,12 +43,15 @@ class Db
      */
     public function __construct(array $conf = null)
     {
-        if ($conf == null) {
-            $this->config = require(__DIR__ . "//../Config/Config.php");
-        } else {
+        if ($conf != null) {
             $this->config = $conf;
+        }else {
+            if(!isset(self::$configs['database'])||empty(self::$configs['database'])) {
+                self::$configs = require (__DIR__ . "//../Config/Config.php");
+            }
+            $this->config = self::$configs;
         }
-        class_exists('PDO') or die("PDO: class not exists.");
+        class_exists('PDO') or Errors::show("PDO: class not exists");
         $this->_host = $this->config['database']['database_host'];
         $this->_port = $this->config['database']['database_port'];
         $this->_user = $this->config['database']['database_user'];
