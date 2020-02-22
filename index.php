@@ -11,6 +11,8 @@ date_default_timezone_set('Asia/Shanghai');
 define('APP_PATH', __DIR__ . '/Application/');
 // 定义缓存目录
 define('CACHE_PATH', __DIR__ . '/Cache/');
+//定义系统目录
+define('SYSTEM_PATH',__DIR__ . '/Core/');
 // 加载框架引导文件
-require __DIR__ . '/Core/App.php';
+require SYSTEM_PATH . '/App.php';
 App::start();
