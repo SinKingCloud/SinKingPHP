@@ -9,6 +9,7 @@ namespace Systems;
 
 use PDO;
 use Systems\Errors;
+use Systems\Config;
 
 class Db
 {
@@ -47,7 +48,7 @@ class Db
             $this->config = $conf;
         }else {
             if(!isset(self::$configs['database'])||empty(self::$configs['database'])) {
-                self::$configs = require (__DIR__ . "//../Config/Config.php");
+                self::$configs = Config::get();
             }
             $this->config = self::$configs;
         }

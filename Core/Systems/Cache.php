@@ -12,6 +12,7 @@ use Systems\Errors;
 use Systems\File;
 use Systems\Dir;
 use Systems\Session;
+use Systems\Config;
 
 class Cache
 {
@@ -23,7 +24,7 @@ class Cache
     public static function init($conf = null)
     {
         if ($conf == null) {
-            self::$config = require(__DIR__ . "//../Config/Config.php");
+            self::$config = Config::get();
         } else {
             self::$config = $conf;
         }

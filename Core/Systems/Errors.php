@@ -7,25 +7,24 @@
 */
 
 namespace Systems;
+use Systems\Config;
 
 class Errors
 {
-    public static $Config;
-    public static function Init($config){
-        if (is_array($config)) {
-            self::$Config = $config;
-        }
-    }
+    private static $configs = null;
     public static function show($message, $url=null,$time = 3)
     {
         if (!empty($url)) {
             header("Refresh:".$time.";url=".$url);
         }
+        if (empty(self::$configs)) {
+            self::$configs = Config::get();
+        }
         self::shows($message);
     }
     private static function shows($error)
     {
-        if (!self::$Config['default_debug']) {
+        if (!self::$configs['default_debug']) {
             $error = '<h2>框架运行错误</h2>';
         }
         if (file_exists(__DIR__ . "//../Error/Error.html")) {

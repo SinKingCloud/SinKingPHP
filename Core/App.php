@@ -9,7 +9,7 @@
 use Systems\Route;
 use Systems\Errors;
 use Systems\Cache;
-
+use Systems\Config;
 class App
 {
     protected $config;
@@ -35,8 +35,7 @@ class App
         try {
             $this->autoload_register();
             $this->removeMagicQuotes();
-            $this->config = require_once("Config/Config.php");
-            Errors::Init($this->config);
+            $this->config = Config::get();
             Route::Init($this->config);
             if ($this->config['DB_Cache']['open']) {
                 Cache::init($this->config);
