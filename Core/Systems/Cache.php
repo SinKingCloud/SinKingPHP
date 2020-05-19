@@ -36,6 +36,7 @@ class Cache
      */
     public static function get($key)
     {
+        $key = md5($key);
         if (is_null(self::$config)) {
             self::init(); //初始化参数
         }
@@ -54,7 +55,7 @@ class Cache
             }
             if ($res) {
                 $res = unserialize($res);
-                if ($res['expiretime']>=time()) {
+                if ($res['expiretime'] >= time()) {
                     return $res['data'];
                 }
                 return false;
@@ -70,8 +71,9 @@ class Cache
      * @param Mixed $value 键值
      * @return Mixed 数据集
      */
-    public static function set($key = null, $value = null)
+    public static function set($key = null, $value = null, $expiretime = null)
     {
+        $key = md5($key);
         if (is_null(self::$config)) {
             self::init();
         }
@@ -84,9 +86,9 @@ class Cache
         $res = false;
         $value = serialize(
             array(
-                'time'=>time(),
-                'expiretime'=>time()+self::$config['DB_Cache']['Cache_Time'],
-                'data'=>$value
+                'time' => time(),
+                'expiretime' => empty($expiretime) ? time() + self::$config['DB_Cache']['Cache_Time'] : time() + $expiretime,
+                'data' => $value
             )
         );
         switch (self::$config['DB_Cache']['Cache_Type']) {
@@ -94,7 +96,7 @@ class Cache
                 $res = self::FilePut($key, $value);
                 break;
             case 'session':
-                $res = Session::set($key,$value,self::$config['DB_Cache']['Cache_Time']);
+                $res = Session::set($key, $value, self::$config['DB_Cache']['Cache_Time']);
                 break;
         }
         if ($res) {

@@ -36,7 +36,7 @@ class Db
     protected $_field = '*';
     protected $_clear = 0;
     //状态，0表示查询条件干净，1表示查询条件污染
-    protected $_trans = 0;
+    protected static $_trans = 0;
     //事务指令数
     /**
      * 初始化类
@@ -485,10 +485,10 @@ class Db
     public function startTrans()
     {
         //数据rollback 支持
-        if ($this->_trans == 0) {
+        if (self::$_trans == 0) {
             self::$_dbh->beginTransaction();
         }
-        $this->_trans++;
+        self::$_trans++;
         return;
     }
     /** 
@@ -498,9 +498,9 @@ class Db
     public function commit()
     {
         $result = true;
-        if ($this->_trans > 0) {
+        if (self::$_trans > 0) {
             $result = self::$_dbh->commit();
-            $this->_trans = 0;
+            self::$_trans = 0;
         }
         return $result;
     }
@@ -511,9 +511,9 @@ class Db
     public function rollback()
     {
         $result = true;
-        if ($this->_trans > 0) {
+        if (self::$_trans > 0) {
             $result = self::$_dbh->rollback();
-            $this->_trans = 0;
+            self::$_trans = 0;
         }
         return $result;
     }

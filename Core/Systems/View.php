@@ -25,11 +25,11 @@ class View
 	*/
     public function fetch($page = null)
     {
-		if (file_exists($page)) {
+		if ($page!=null&&file_exists($page)) {
 			$this->assign($this->key, $this->val);
 			extract($this->array);
             return include_once $page;
-        }
+		}
         if (empty($page)) {
 			$page = explode("/", $this->module ."/".$this->controller ."/".$this->action);
 			$page = end($page);
