@@ -22,7 +22,8 @@ class Console extends View
 	* @param Json信息输出
 	* @arr:需要转换的数组
 	*/
-	public function json($arr = array()){
-		exit(json_encode($arr,JSON_UNESCAPED_UNICODE));
+	public function json($arr = array(),$code = JSON_UNESCAPED_UNICODE){
+		header("Content-Type:text/json");
+		return json_encode($arr,$code);
 	}
 }

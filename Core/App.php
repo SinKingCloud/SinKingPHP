@@ -89,7 +89,13 @@ class App
             $class = $this->config['default_namespace'] . '\\' . ucwords(strtolower($this->module)) . '\\' . $this->config['default_controller_name'] . '\\' . ucwords(strtolower($this->controller));
             $controller = new $class();
             if (method_exists($controller, $this->action)) {
-                call_user_func_array(array($controller, $this->action), $this->value);
+                $return = call_user_func_array(array($controller, $this->action), $this->value);
+                if (is_array($return)) {
+                    header("Content-Type:text/json");
+                    echo json_encode($return,JSON_UNESCAPED_UNICODE);
+                }else if(is_string($return)){
+                    echo $return;
+                }
             } else {
                 Errors::show("方法不存在</br>" . $this->action);
             }

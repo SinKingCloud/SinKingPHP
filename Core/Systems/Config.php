@@ -11,19 +11,22 @@ namespace Systems;
 class Config
 {
     private static $configs = null; //框架设置
-    /** 
-     * @param Title 获取设置
+    /**
+     * 获取设置
+     * @param String $key 下标
+     * @return mixed 数据集
      */
-    public static function get()
+    public static function get($key = "")
     {
         if (empty(self::$configs)) {
             self::$configs = require(__DIR__ . "//../Config/Config.php");
         }
-        return self::$configs;
+        return $key == "" ? self::$configs : self::$configs[$key];
     }
-    /** 
-     * @param Title 更新设置
-     * @param Array 设置
+    /**
+     * 更新设置
+     * @param String $value 值
+     * @return mixed
      */
     public static function set($value)
     {

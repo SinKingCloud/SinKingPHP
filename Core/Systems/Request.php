@@ -27,12 +27,10 @@ class Request
 
 	public static function GetData($key=""){
 		if(empty($key)){
-			return false;
+			return $_REQUEST;
 		}
-		if (isset($_GET[$key])) {
-			return $_GET[$key];
-		}elseif(isset($_POST[$key])){
-			return $_POST[$key];
+		if (isset($_REQUEST[$key])) {
+			return $_REQUEST[$key];
 		}else{
 			return null;
 		}
@@ -40,7 +38,7 @@ class Request
 	
 	public static function GetPostData($key=""){
 		if(empty($key)){
-			return false;
+			return $_POST;
 		}
 		if(isset($_POST[$key])){
 			return $_POST[$key];
@@ -51,7 +49,7 @@ class Request
 	
 	public static function GetGetData($key = ""){
 		if(empty($key)){
-			return false;
+			return $_GET;
 		}
 		if(isset($_GET[$key])){
 			return $_GET[$key];

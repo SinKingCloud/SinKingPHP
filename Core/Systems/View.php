@@ -48,7 +48,7 @@ class View
 			$return = $this->app_path .ucwords(strtolower($this->module)) .'/'. $this->config['default_view_name']. '/' . strtolower($this->controller)  . '/' . $return;
 		}
         if (file_exists($return)) {
-            return include_once $return;
+            return require_once($return);
         }else{
 			Errors::show("模板文件不存在</br>".$return);
 		}
