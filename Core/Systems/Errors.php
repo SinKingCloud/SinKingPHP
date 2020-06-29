@@ -14,6 +14,7 @@ class Errors
     private static $configs = null;
     public static function show($message, $url=null,$time = 3)
     {
+        header("Content-Type:text/html");
         if (!empty($url)) {
             header("Refresh:".$time.";url=".$url);
         }

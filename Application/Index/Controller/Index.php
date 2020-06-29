@@ -11,7 +11,8 @@ use Systems\Console;
 use app\Index\Model\User;
 class Index extends Console
 {
-    public function index(){
+	public function index()
+	{
 		$this->assign("userinfo",User::info("朋友"));
 		return $this->fetch();
 	}

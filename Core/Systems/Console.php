@@ -24,6 +24,6 @@ class Console extends View
 	*/
 	public function json($arr = array(),$code = JSON_UNESCAPED_UNICODE){
 		header("Content-Type:text/json");
-		return json_encode($arr,$code);
+		exit(json_encode($arr,$code));
 	}
 }

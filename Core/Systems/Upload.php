@@ -73,7 +73,7 @@ class Upload
 			}
 			//开始移动
 			if (move_uploaded_file($file['tmp_name'], $this->path . $filename)) {
-				return array('file' => $this->path . $filename, 'size' => $file['size'], 'type' => $file['type']);
+				return array('file' => $this->path . $filename,'name'=>$filename, 'size' => $file['size'], 'type' => $file['type']);
 			} else {
 				self::$error = -3;
 				return false;

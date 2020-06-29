@@ -41,7 +41,6 @@ class Cookie
         if (is_array($value)) {
             $arr = [];
             foreach ($value as $k => $v) {
-                # code...
                 $arr[$k] = substr($v, 0, 1) == '{' ? json_decode($value) : $v;
             }
             return $arr;
