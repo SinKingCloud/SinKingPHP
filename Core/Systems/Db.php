@@ -320,7 +320,7 @@ class Db
      */
     public function find()
     {
-        $sql = "select " . trim($this->_field) . " from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " " . trim($this->_limit);
+        $sql = "select " . trim($this->_field) . " from " . trim($this->_table) . " " . trim($this->_join) . " " . trim($this->_where) . " " . trim($this->_order) . " limit 1";
         //echo $sql.'</br>';
         $this->_clear = 1;
         $this->_clear();

@@ -6,17 +6,9 @@
 * QQ：1178710004
 */
 namespace app\Index\Model;
-
-class User
+use Systems\Model;
+class User extends Model
 {
-    /**
-     * @param Title 测试模型
-     * @param String $name 用户名称
-     */
-    public static function Info($name){
-        return array(
-            'name'=>$name,
-            'role'=>'开发者'
-        );
-    }
+    protected $name = "users";
+    protected $id = "uid";
 }

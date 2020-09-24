@@ -8,12 +8,11 @@
 
 namespace app\Index\Controller;
 use Systems\Console;
-use app\Index\Model\User;
 class Index extends Console
 {
 	public function index()
 	{
-		$this->assign("userinfo",User::info("朋友"));
+		$this->assign("userinfo",array('name'=>'朋友','role'=>'开发者'));
 		return $this->fetch();
 	}
 }
