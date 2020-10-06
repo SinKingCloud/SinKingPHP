@@ -34,7 +34,7 @@ class Safe
         if (!self::$Statu) {
             return false;
         }
-        if (!empty(self::$WhiteDIr) && !empty(self::$WhiteUrl)) {
+        if (!empty(self::$WhiteDIr) || !empty(self::$WhiteUrl)) {
             if (!$this->CheckWhite(self::$WhiteDIr, self::$WhiteUrl)) {
                 return;
             }
@@ -53,17 +53,27 @@ class Safe
     {
         $url_path = $_SERVER['SCRIPT_NAME'];
         $url_var = $_SERVER['QUERY_STRING'];
-        if (preg_match("/" . $webscan_white_name . "/is", $url_path) == 1 && !empty($webscan_white_name)) {
-            return false;
-        }
-        foreach ($webscan_white_url as $key => $value) {
-            if (!empty($url_var) && !empty($value)) {
-                if (stristr($url_path, $key) && stristr($url_var, $value)) {
+        if (is_array($webscan_white_name)) {
+            foreach ($webscan_white_name as $key) {
+                if (preg_match("/" . $key . "/is", $url_path) == 1 && !empty($key)) {
                     return false;
                 }
-            } elseif (empty($url_var) && empty($value)) {
-                if (stristr($url_path, $key)) {
-                    return false;
+            }
+        }else {
+            if (preg_match("/" . $webscan_white_name . "/is", $url_path) == 1 && !empty($webscan_white_name)) {
+                return false;
+            }
+        }
+        foreach ($webscan_white_url as $key2) {
+            foreach ($key2 as $key => $value) {
+                if (!empty($url_var) && !empty($value)) {
+                    if (stristr($url_path, $key) && stristr($url_var, $value)) {
+                        return false;
+                    }
+                } elseif (empty($url_var) && empty($value)) {
+                    if (stristr($url_path, $key)) {
+                        return false;
+                    }
                 }
             }
         }
